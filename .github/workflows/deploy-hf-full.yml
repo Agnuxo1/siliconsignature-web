@@ -1,0 +1,45 @@
+name: Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Create HF Space if not exists
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Try to create the Space (will fail gracefully if already exists)
+          curl -s -X POST \
+            -H "Authorization: Bearer $HF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "siliconsignature-web",
+              "sdk": "static",
+              "description": "SiliconSignature - Cryptographically sign and verify images with Reed-Solomon watermarking",
+              "emoji": "🔏",
+              "license": "mit"
+            }' \
+            "https://huggingface.co/api/spaces" || true
+          
+      - name: Push to Hugging Face Spaces
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git remote add hf https://x:$HF_TOKEN@huggingface.co/spaces/Agnuxo/siliconsignature-web 2>/dev/null || true
+          # Remove GitHub-specific files before pushing to HF
+          git push -f hf main
+          
+      - name: Verify deployment
+        run: |
+          echo "SiliconSignature deployed to: https://huggingface.co/spaces/Agnuxo/siliconsignature-web"
+          echo "It may take 2-3 minutes for the Space to become available."
