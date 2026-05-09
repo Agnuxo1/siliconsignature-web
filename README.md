@@ -13,7 +13,7 @@
 [![Go](https://img.shields.io/badge/Go-CLI-00ADD8.svg?style=flat-square&logo=go)](https://github.com/Agnuxo1/siliconsignature-go)
 [![Rust](https://img.shields.io/badge/Rust-Library-000000.svg?style=flat-square&logo=rust)](https://github.com/Agnuxo1/siliconsignature-rust)
 [![TypeScript](https://img.shields.io/badge/TypeScript-npm-3178C6.svg?style=flat-square&logo=typescript)](https://github.com/Agnuxo1/siliconsignature-ts)
-[![Android](https://img.shields.io/badge/Android-APK-3DDC84.svg?style=flat-square&logo=android)](https://github.com/Agnuxo1/siliconsignature-web/tree/main/android)
+[![Android](https://img.shields.io/badge/Android-APK-3DDC84.svg?style=flat-square&logo=android)](https://github.com/Agnuxo1/silicon-android)
 
 </div>
 
@@ -123,13 +123,13 @@ SiliconSignature is available in **7 languages/platforms**:
 | Platform | Repository | Status |
 |----------|-----------|--------|
 | 🌐 **Web/PWA** | [siliconsignature-web](https://github.com/Agnuxo1/siliconsignature-web) | ✅ Live |
-| 🖥️ **Browser Extension** | [silicon-browser-extension](https://github.com/Agnuxo1/siliconsignature-web/tree/main/extension) | ✅ Chrome/Firefox |
-| 🎨 **ComfyUI Node** | [silicon-comfyui-node](https://github.com/Agnuxo1/siliconsignature-web/tree/main/comfyui) | ✅ Custom node |
-| 🎨 **A1111 Script** | [silicon-a1111-script](https://github.com/Agnuxo1/siliconsignature-web/tree/main/a1111) | ✅ WebUI script |
+| 🖥️ **Browser Extension** | [silicon-browser-extension](https://github.com/Agnuxo1/silicon-browser-extension) | ✅ Chrome/Firefox |
+| 🎨 **ComfyUI Node** | [silicon-comfyui-node](https://github.com/Agnuxo1/silicon-comfyui-node) | ✅ Custom node |
+| 🎨 **A1111 Script** | [silicon-a1111-script](https://github.com/Agnuxo1/silicon-a1111-script) | ✅ WebUI script |
 | 🐹 **Go CLI** | [siliconsignature-go](https://github.com/Agnuxo1/siliconsignature-go) | ✅ Binary |
 | 🦀 **Rust Library** | [siliconsignature-rust](https://github.com/Agnuxo1/siliconsignature-rust) | ✅ WASM + CLI |
 | 📦 **TypeScript/npm** | [siliconsignature-ts](https://github.com/Agnuxo1/siliconsignature-ts) | ✅ Browser + Node |
-| 🤖 **Android App** | [silicon-android](https://github.com/Agnuxo1/siliconsignature-web/tree/main/android) | ✅ APK |
+| 🤖 **Android App** | [silicon-android](https://github.com/Agnuxo1/silicon-android) | ✅ APK |
 
 ---
 
