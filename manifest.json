@@ -1,0 +1,33 @@
+{
+  "name": "SiliconSignature",
+  "short_name": "SiliconSig",
+  "description": "Hardware-Bound Image Authentication — Sign and verify images with ASIC-bound watermarks",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#00ff88",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "72x72 96x96 128x128 144x144 192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "security", "productivity"],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://silicon.p2pclaw.com"
+    }
+  ],
+  "prefer_related_applications": false
+}
