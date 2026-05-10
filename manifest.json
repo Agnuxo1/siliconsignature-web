@@ -1,47 +1,44 @@
 {
   "name": "SiliconSignature",
   "short_name": "SiliconSig",
-  "description": "Hardware-Bound Image Authentication — Sign and verify images with ASIC-bound watermarks",
+  "description": "Cryptographically sign and verify images using Reed-Solomon protected LSB steganography",
+  "version": "1.0.0",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0f",
-  "theme_color": "#00ff88",
-  "orientation": "portrait-primary",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "any",
   "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "utilities", "security"],
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "any",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%23f5a623' rx='29' width='192' height='192'/%3E%3Cpath fill='%231a1a2e' d='M58 124 L96 48 L134 124 H116 L96 84 L76 124 Z'/%3E%3Ccircle fill='%231a1a2e' cx='96' cy='130' r='11'/%3E%3C/svg%3E",
+      "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon.svg",
-      "sizes": "72x72 96x96 128x128 144x144 192x192 512x512",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%23f5a623' rx='77' width='512' height='512'/%3E%3Cpath fill='%231a1a2e' d='M154 330 L256 106 L358 330 H309 L256 224 L203 330 Z'/%3E%3Ccircle fill='%231a1a2e' cx='256' cy='346' r='30'/%3E%3C/svg%3E",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["utilities", "security", "productivity"],
   "screenshots": [
     {
-      "src": "/screenshot-wide.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1280' height='720'%3E%3Crect fill='%231a1a2e' width='1280' height='720'/%3E%3Ctext x='640' y='360' fill='%23f5a623' font-size='48' font-family='sans-serif' font-weight='bold' text-anchor='middle'%3ESiliconSignature Screenshot%3C/text%3E%3C/svg%3E",
       "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "SiliconSignature main interface"
     },
     {
-      "src": "/screenshot-narrow.png",
-      "sizes": "720x1280",
-      "type": "image/png",
-      "form_factor": "narrow"
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='750' height='1334'%3E%3Crect fill='%231a1a2e' width='750' height='1334'/%3E%3Ctext x='375' y='667' fill='%23f5a623' font-size='36' font-family='sans-serif' font-weight='bold' text-anchor='middle'%3ESiliconSignature Mobile%3C/text%3E%3C/svg%3E",
+      "sizes": "750x1334",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "SiliconSignature mobile view"
     }
-  ],
-  "related_applications": [
-    {
-      "platform": "webapp",
-      "url": "https://silicon.p2pclaw.com"
-    }
-  ],
-  "prefer_related_applications": false
+  ]
 }

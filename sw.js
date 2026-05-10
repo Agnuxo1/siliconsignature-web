@@ -1,92 +1,109 @@
+/**
+ * SiliconSignature Service Worker
+ * Provides offline functionality by caching all assets.
+ * Uses Cache-First strategy for static assets.
+ */
+
 const CACHE_NAME = 'siliconsignature-v1';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/css/style.css',
+  '/js/reedsolomon.js',
+  '/js/crypto.js',
+  '/js/watermark.js',
+  '/js/app.js',
+  '/manifest.json'
 ];
 
-// Install: cache static assets
+// ---------------------------------------------------------------------------
+// Install: Cache all static assets
+// ---------------------------------------------------------------------------
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    }).then(() => {
-      return self.skipWaiting();
-    })
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        return cache.addAll(STATIC_ASSETS);
+      })
+      .then(() => {
+        return self.skipWaiting();
+      })
+      .catch((err) => {
+        console.error('[SW] Cache install failed:', err);
+      })
   );
 });
 
-// Activate: clean old caches
+// ---------------------------------------------------------------------------
+// Activate: Clean up old caches
+// ---------------------------------------------------------------------------
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames
+            .filter((name) => name !== CACHE_NAME)
+            .map((name) => caches.delete(name))
+        );
+      })
+      .then(() => {
+        return self.clients.claim();
+      })
   );
 });
 
-// Fetch: cache-first strategy
+// ---------------------------------------------------------------------------
+// Fetch: Cache-first strategy
+// ---------------------------------------------------------------------------
 self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  
-  // Skip non-GET requests
-  if (request.method !== 'GET') return;
-  
-  // Skip chrome-extension requests
-  if (request.url.startsWith('chrome-extension://')) return;
-  
+  // Skip non-GET requests and non-HTTP(S) URLs
+  if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith('http')) return;
+
+  // Skip external resources (fonts, etc.)
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) {
-        // Return cached and revalidate in background
-        fetch(request).then((response) => {
-          if (response.ok) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, response);
-            });
-          }
-        }).catch(() => {});
-        return cached;
-      }
-      
-      return fetch(request).then((response) => {
-        if (!response.ok) return response;
-        
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, clone);
-        });
-        return response;
-      }).catch(() => {
-        // Offline fallback
-        if (request.destination === 'document') {
-          return caches.match('/index.html');
+    caches.match(event.request)
+      .then((cached) => {
+        // Return cached version if available
+        if (cached) {
+          return cached;
         }
-        return new Response('Offline', { status: 503 });
-      });
-    })
+
+        // Otherwise fetch from network and cache
+        return fetch(event.request)
+          .then((response) => {
+            // Don't cache non-successful responses
+            if (!response || response.status !== 200 || response.type !== 'basic') {
+              return response;
+            }
+
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          })
+          .catch(() => {
+            // Network failed - return offline fallback if we have one
+            return caches.match('/index.html');
+          });
+      })
   );
 });
 
-// Background sync for offline signing
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-signatures') {
-    event.waitUntil(syncPendingSignatures());
+// ---------------------------------------------------------------------------
+// Message handling from clients
+// ---------------------------------------------------------------------------
+self.addEventListener('message', (event) => {
+  if (event.data === 'skipWaiting') {
+    self.skipWaiting();
   }
 });
-
-async function syncPendingSignatures() {
-  // Placeholder: sync pending signatures when back online
-  const clients = await self.clients.matchAll();
-  clients.forEach(client => {
-    client.postMessage({ type: 'SYNC_COMPLETE' });
-  });
-}

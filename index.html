@@ -1,698 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiliconSignature — Hardware-Bound Image Authentication</title>
-    <style>
-        :root {
-            --bg: #0a0a0f;
-            --bg2: #12121a;
-            --accent: #00ff88;
-            --accent2: #00ccff;
-            --text: #e0e0e0;
-            --text2: #888;
-            --border: #2a2a3a;
-            --danger: #ff4444;
-            --success: #00ff88;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; }
-        
-        .header {
-            padding: 20px 40px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo { display: flex; align-items: center; gap: 12px; }
-        .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .logo-text { font-size: 24px; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .tagline { color: var(--text2); font-size: 14px; margin-left: 52px; }
-        
-        .nav { display: flex; gap: 8px; }
-        .nav-btn {
-            padding: 8px 20px;
-            border: 1px solid var(--border);
-            background: var(--bg2);
-            color: var(--text);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 14px;
-        }
-        .nav-btn:hover, .nav-btn.active {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px; }
-        
-        .hero {
-            text-align: center;
-            padding: 60px 20px;
-            border-bottom: 1px solid var(--border);
-        }
-        .hero h1 { font-size: 48px; margin-bottom: 16px; }
-        .hero p { font-size: 18px; color: var(--text2); max-width: 600px; margin: 0 auto 32px; }
-        .hero .stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 40px;
-        }
-        .stat { text-align: center; }
-        .stat-value { font-size: 36px; font-weight: 700; color: var(--accent); }
-        .stat-label { color: var(--text2); font-size: 14px; }
-        
-        .panel {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 32px;
-            margin-bottom: 24px;
-        }
-        .panel-title { font-size: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        
-        .dropzone {
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            padding: 60px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .dropzone:hover, .dropzone.dragover {
-            border-color: var(--accent);
-            background: rgba(0,255,136,0.05);
-        }
-        .dropzone-icon { font-size: 48px; margin-bottom: 16px; }
-        
-        .btn {
-            padding: 12px 32px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: var(--bg);
-        }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,255,136,0.3); }
-        .btn-secondary {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-        }
-        
-        .result {
-            margin-top: 24px;
-            padding: 20px;
-            border-radius: 8px;
-            display: none;
-        }
-        .result.success { background: rgba(0,255,136,0.1); border: 1px solid var(--success); }
-        .result.error { background: rgba(255,68,68,0.1); border: 1px solid var(--danger); }
-        .result.show { display: block; }
-        
-        .signature-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-        }
-        .info-card {
-            background: var(--bg);
-            padding: 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .info-label { color: var(--text2); font-size: 12px; text-transform: uppercase; }
-        .info-value { font-size: 16px; margin-top: 4px; word-break: break-all; font-family: monospace; }
-        
-        .preview-img {
-            max-width: 100%;
-            max-height: 400px;
-            border-radius: 8px;
-            margin-top: 16px;
-        }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .footer {
-            text-align: center;
-            padding: 40px;
-            border-top: 1px solid var(--border);
-            color: var(--text2);
-            font-size: 14px;
-        }
-        .footer a { color: var(--accent); text-decoration: none; }
-        
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge-green { background: rgba(0,255,136,0.15); color: var(--success); }
-        .badge-red { background: rgba(255,68,68,0.15); color: var(--danger); }
-        
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        input:focus { outline: none; border-color: var(--accent); }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        @media (max-width: 768px) {
-            .grid-2 { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 32px; }
-            .header { flex-direction: column; gap: 16px; }
-        }
-        
-        .api-config {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-            width: 300px;
-            z-index: 100;
-            display: none;
-        }
-        .api-config.show { display: block; }
-        .api-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 101;
-            cursor: pointer;
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SiliconSignature - Image Signing & Verification</title>
+  <meta name="description" content="Cryptographically sign and verify images using Reed-Solomon protected LSB steganography.">
+  <meta name="theme-color" content="#1a1a2e">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23f5a623' rx='15' width='100' height='100'/%3E%3Cpath fill='%231a1a2e' d='M30 65 L50 25 L70 65 L60 65 L50 45 L40 65 Z'/%3E%3Ccircle fill='%231a1a2e' cx='50' cy='68' r='6'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%23f5a623' rx='27' width='180' height='180'/%3E%3Cpath fill='%231a1a2e' d='M54 117 L90 45 L126 117 L108 117 L90 81 L72 117 Z'/%3E%3Ccircle fill='%231a1a2e' cx='90' cy='122' r='11'/%3E%3C/svg%3E">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="header">
-        <div>
-            <div class="logo">
-                <div class="logo-icon">⚡</div>
-                <div class="logo-text">SiliconSignature</div>
-            </div>
-            <div class="tagline">Hardware-Bound Image Authentication — ASIC Proof-of-Work</div>
+
+  <!-- Header / Nav -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="#" class="logo" onclick="event.preventDefault(); window.scrollTo({top:0,behavior:'smooth'});">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="#f5a623"/>
+            <path d="M12 28L20 12L28 28H24L20 20L16 28H12Z" fill="#1a1a2e"/>
+            <circle cx="20" cy="30" r="2.5" fill="#1a1a2e"/>
+          </svg>
         </div>
-        <div class="nav">
-            <button class="nav-btn active" onclick="showTab('sign')">🔏 Sign</button>
-            <button class="nav-btn" onclick="showTab('verify')">🔍 Verify</button>
-            <button class="nav-btn" onclick="showTab('generate')">🎨 Generate</button>
-            <button class="nav-btn" onclick="showTab('about')">📖 About</button>
+        <div class="logo-text">
+          <span class="logo-title">SiliconSignature</span>
+          <span class="logo-subtitle">v1.0</span>
         </div>
+      </a>
+
+      <nav class="main-nav" role="navigation" aria-label="Main navigation">
+        <button class="nav-link active" id="nav-sign" aria-label="Sign image">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          <span>Sign</span>
+        </button>
+        <button class="nav-link" id="nav-verify" aria-label="Verify image">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+          <span>Verify</span>
+        </button>
+        <button class="nav-link" id="nav-history" aria-label="View history">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>History</span>
+        </button>
+        <button class="nav-link" id="nav-about" aria-label="About">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4"/>
+            <path d="M12 8h.01"/>
+          </svg>
+          <span>About</span>
+        </button>
+      </nav>
     </div>
-    
-    <div class="api-toggle" onclick="toggleApiConfig()">⚙️ API</div>
-    <div class="api-config" id="apiConfig">
-        <h3 style="margin-bottom:12px">API Configuration</h3>
-        <input type="text" id="apiUrl" placeholder="API URL" value="https://silicon-api.p2pclaw.com">
-        <input type="password" id="apiKey" placeholder="API Key">
-        <button class="btn btn-primary" onclick="saveApiConfig()" style="width:100%">Save</button>
-    </div>
+  </header>
 
-    <div class="container">
-        <!-- SIGN TAB -->
-        <div class="tab-content active" id="tab-sign">
-            <div class="hero">
-                <h1>🔏 Sign Your Image</h1>
-                <p>Upload an image to create a hardware-bound cryptographic signature. The signature is embedded in the image metadata and survives up to 40% of pixel destruction.</p>
-            </div>
-            
-            <div class="panel">
-                <div class="panel-title">📤 Upload Image</div>
-                <div class="dropzone" id="signDropzone" onclick="document.getElementById('signFile').click()">
-                    <div class="dropzone-icon">📁</div>
-                    <p>Drag & drop an image here, or click to browse</p>
-                    <p style="color:var(--text2);font-size:12px;margin-top:8px">PNG, JPG, WEBP — Max 10MB</p>
-                </div>
-                <input type="file" id="signFile" style="display:none" accept="image/*" onchange="handleSignFile(event)">
-                
-                <div style="margin-top:16px">
-                    <input type="text" id="creatorId" placeholder="Creator ID (optional)" style="max-width:400px">
-                </div>
-                
-                <img class="preview-img" id="signPreview" style="display:none">
-                
-                <div style="margin-top:16px">
-                    <button class="btn btn-primary" id="signBtn" onclick="signImage()" disabled>🔏 Sign Image</button>
-                </div>
-                
-                <div class="result" id="signResult">
-                    <div id="signResultContent"></div>
-                </div>
-            </div>
-        </div>
+  <!-- Main Content -->
+  <main class="app-main">
 
-        <!-- VERIFY TAB -->
-        <div class="tab-content" id="tab-verify">
-            <div class="hero">
-                <h1>🔍 Verify Authenticity</h1>
-                <p>Upload any image to check if it contains a valid Silicon signature. We'll tell you who signed it, when, and whether the image has been tampered with.</p>
-            </div>
-            
-            <div class="panel">
-                <div class="panel-title">📤 Upload Image to Verify</div>
-                <div class="dropzone" id="verifyDropzone" onclick="document.getElementById('verifyFile').click()">
-                    <div class="dropzone-icon">🔍</div>
-                    <p>Drag & drop an image here, or click to browse</p>
-                </div>
-                <input type="file" id="verifyFile" style="display:none" accept="image/*" onchange="handleVerifyFile(event)">
-                
-                <img class="preview-img" id="verifyPreview" style="display:none">
-                
-                <div style="margin-top:16px">
-                    <button class="btn btn-primary" id="verifyBtn" onclick="verifyImage()" disabled>🔍 Verify</button>
-                </div>
-                
-                <div class="result" id="verifyResult">
-                    <div id="verifyResultContent"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- GENERATE TAB -->
-        <div class="tab-content" id="tab-generate">
-            <div class="hero">
-                <h1>🎨 Generate & Sign</h1>
-                <p>Create AI-generated images with automatic Silicon signatures. Every generated image is instantly authenticated with hardware-bound proof-of-work.</p>
-            </div>
-            
-            <div class="panel">
-                <div class="panel-title">📝 Prompt</div>
-                <input type="text" id="genPrompt" placeholder="A photorealistic cat exploring Mars..." style="width:100%;margin-bottom:16px">
-                
-                <div class="grid-2">
-                    <div>
-                        <label style="color:var(--text2);font-size:12px">Model</label>
-                        <select id="genModel" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-top:4px">
-                            <option value="flux">Flux.1 Dev</option>
-                            <option value="sdxl">Stable Diffusion XL</option>
-                            <option value="dalle">DALL-E 3</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="color:var(--text2);font-size:12px">Auto-Sign</label>
-                        <select id="genAutoSign" style="width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);margin-top:4px">
-                            <option value="yes">✅ Yes, sign after generation</option>
-                            <option value="no">❌ No, just generate</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div style="margin-top:24px">
-                    <button class="btn btn-primary" onclick="generateImage()">🎨 Generate & Sign</button>
-                </div>
-                
-                <div class="result" id="genResult">
-                    <div id="genResultContent"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ABOUT TAB -->
-        <div class="tab-content" id="tab-about">
-            <div class="hero">
-                <h1>📖 Silicon Signature</h1>
-                <p>The only image authentication system that proves physical work was done to create it.</p>
-                <div class="stats">
-                    <div class="stat">
-                        <div class="stat-value">ASIC</div>
-                        <div class="stat-label">Hardware Proof</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-value">40%</div>
-                        <div class="stat-label">Survival Rate</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-value">Zero</div>
-                        <div class="stat-label">Trust Required</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="grid-2">
-                <div class="panel">
-                    <div class="panel-title">🔐 How It Works</div>
-                    <ol style="padding-left:20px;line-height:2">
-                        <li><strong>Hash:</strong> SHA-256 of image structure</li>
-                        <li><strong>Proof:</strong> ASIC/CPU finds nonce (PoW)</li>
-                        <li><strong>Embed:</strong> Signature in PNG metadata</li>
-                        <li><strong>Watermark:</strong> Reed-Solomon in LSB</li>
-                        <li><strong>Verify:</strong> Check nonce + hash match</li>
-                    </ol>
-                </div>
-                <div class="panel">
-                    <div class="panel-title">🛡️ Tamper Resistance</div>
-                    <ul style="padding-left:20px;line-height:2">
-                        <li>Survives 40% pixel destruction</li>
-                        <li>Reed-Solomon error correction</li>
-                        <li>5× redundancy encoding</li>
-                        <li>ASIC work unforgeable ($10K+ cost)</li>
-                        <li>No central authority needed</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="panel">
-                <div class="panel-title">🔗 Available Platforms</div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:12px">
-                    <a href="https://agnuxo1.github.io/siliconsignature-web/" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">🌐</div>
-                            <div style="font-weight:600;color:var(--text)">Web / PWA</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">Live Now</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/Agnuxo1/silicon-browser-extension" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">🖥️</div>
-                            <div style="font-weight:600;color:var(--text)">Browser Extension</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">Chrome / Firefox</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/Agnuxo1/silicon-comfyui-node" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">🎨</div>
-                            <div style="font-weight:600;color:var(--text)">ComfyUI Node</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">Custom Node</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/Agnuxo1/silicon-a1111-script" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">🎨</div>
-                            <div style="font-weight:600;color:var(--text)">A1111 Script</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">WebUI Script</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/Agnuxo1/siliconsignature-go" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">🐹</div>
-                            <div style="font-weight:600;color:var(--text)">Go CLI</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">Binary / Server</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/Agnuxo1/siliconsignature-rust" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">🦀</div>
-                            <div style="font-weight:600;color:var(--text)">Rust Library</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">WASM + CLI</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/Agnuxo1/siliconsignature-ts" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">📦</div>
-                            <div style="font-weight:600;color:var(--text)">TypeScript</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">npm Package</div>
-                        </div>
-                    </a>
-                    <a href="https://github.com/Agnuxo1/silicon-android" style="text-decoration:none">
-                        <div class="platform-card" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center">
-                            <div style="font-size:32px;margin-bottom:8px">🤖</div>
-                            <div style="font-weight:600;color:var(--text)">Android App</div>
-                            <div style="font-size:12px;color:var(--text2);margin-top:4px">APK</div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="panel">
-                <div class="panel-title">🔗 Integrations</div>
-                <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
-                    <span class="badge badge-green">✅ VS Code Extension</span>
-                    <span class="badge badge-green">✅ Browser Extension</span>
-                    <span class="badge badge-green">✅ ComfyUI Node</span>
-                    <span class="badge badge-green">✅ A1111 Script</span>
-                    <span class="badge badge-green">✅ REST API</span>
-                    <span class="badge badge-green">✅ Python SDK</span>
-                    <span class="badge badge-green">✅ CLI Tool</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        <p>SiliconSignature — Part of the <a href="https://p2pclaw.com">P2PCLAW</a> Ecosystem</p>
-        <p style="margin-top:8px">Built by Francisco Angulo de Lafuente (Agnuxo1) · Open Source · MIT License</p>
-        <p style="margin-top:8px">
-            <a href="https://github.com/Agnuxo1/Secure_image_generation_with_ASIC_signature">GitHub</a> ·
-            <a href="https://p2pclaw.com/silicon">Live Demo</a> ·
-            <a href="https://huggingface.co/Agnuxo">HuggingFace</a>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="hero-accent">Cryptographically</span> Sign & Verify Images
+        </h1>
+        <p class="hero-desc">
+          Embed tamper-evident digital signatures into images using Reed-Solomon error correction
+          and SHA-256 proof-of-work. Verify authenticity across any platform.
         </p>
-    </div>
+      </div>
+    </section>
 
-    <script>
-        // API Configuration
-        let API_URL = localStorage.getItem('silicon_api_url') || 'https://silicon-api.p2pclaw.com';
-        let API_KEY = localStorage.getItem('silicon_api_key') || '';
-        
-        // Tab switching
-        function showTab(tab) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            event.target.classList.add('active');
-        }
-        
-        // API config toggle
-        function toggleApiConfig() {
-            document.getElementById('apiConfig').classList.toggle('show');
-        }
-        
-        function saveApiConfig() {
-            API_URL = document.getElementById('apiUrl').value;
-            API_KEY = document.getElementById('apiKey').value;
-            localStorage.setItem('silicon_api_url', API_URL);
-            localStorage.setItem('silicon_api_key', API_KEY);
-            document.getElementById('apiConfig').classList.remove('show');
-            showResult('signResult', 'success', 'API configuration saved!');
-        }
-        
-        // File handling
-        let currentSignFile = null;
-        let currentVerifyFile = null;
-        
-        function handleSignFile(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            currentSignFile = file;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('signPreview').src = e.target.result;
-                document.getElementById('signPreview').style.display = 'block';
-                document.getElementById('signBtn').disabled = false;
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        function handleVerifyFile(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            currentVerifyFile = file;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                document.getElementById('verifyPreview').src = e.target.result;
-                document.getElementById('verifyPreview').style.display = 'block';
-                document.getElementById('verifyBtn').disabled = false;
-            };
-            reader.readAsDataURL(file);
-        }
-        
-        // Drag & drop
-        ['signDropzone', 'verifyDropzone'].forEach(id => {
-            const dz = document.getElementById(id);
-            dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
-            dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
-            dz.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dz.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    if (id === 'signDropzone') {
-                        document.getElementById('signFile').files = e.dataTransfer.files;
-                        handleSignFile({target: {files: [file]}});
-                    } else {
-                        document.getElementById('verifyFile').files = e.dataTransfer.files;
-                        handleVerifyFile({target: {files: [file]}});
-                    }
-                }
-            });
-        });
-        
-        // Sign image
-        async function signImage() {
-            if (!currentSignFile) return;
-            
-            const btn = document.getElementById('signBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Signing...';
-            
-            try {
-                // For now, use browser-based signing (software mode)
-                // In production, this calls the API
-                const formData = new FormData();
-                formData.append('file', currentSignFile);
-                formData.append('creator_id', document.getElementById('creatorId').value || 'web_user');
-                
-                const response = await fetch(API_URL + '/api/v1/sign', {
-                    method: 'POST',
-                    headers: API_KEY ? {'X-API-Key': API_KEY} : {},
-                    body: formData
-                });
-                
-                if (!response.ok) throw new Error('API error: ' + response.status);
-                
-                const result = await response.json();
-                
-                // Download signed image
-                const blob = await response.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'signed_' + currentSignFile.name;
-                a.click();
-                
-                showResult('signResult', 'success', `
-                    <h3>✅ Image Signed Successfully!</h3>
-                    <div class="signature-info">
-                        <div class="info-card">
-                            <div class="info-label">Creator</div>
-                            <div class="info-value">${result.creator || 'unknown'}</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Nonce</div>
-                            <div class="info-value">${result.nonce || 'N/A'}</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Hash</div>
-                            <div class="info-value">${result.hash ? result.hash.substring(0,32) + '...' : 'N/A'}</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Timestamp</div>
-                            <div class="info-value">${result.timestamp || new Date().toISOString()}</div>
-                        </div>
-                    </div>
-                `);
-                
-            } catch (err) {
-                // Fallback: show demo signature
-                showResult('signResult', 'success', `
-                    <h3>✅ Demo Signature Created</h3>
-                    <p><strong>API not configured.</strong> In production, this would call: ${API_URL}</p>
-                    <div class="signature-info">
-                        <div class="info-card">
-                            <div class="info-label">Creator</div>
-                            <div class="info-value">${document.getElementById('creatorId').value || 'web_user'}</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Mode</div>
-                            <div class="info-value">software_cpu</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Timestamp</div>
-                            <div class="info-value">${new Date().toISOString()}</div>
-                        </div>
-                        <div class="info-card">
-                            <div class="info-label">Status</div>
-                            <div class="info-value">ready_for_api</div>
-                        </div>
-                    </div>
-                `);
-            }
-            
-            btn.disabled = false;
-            btn.textContent = '🔏 Sign Image';
-        }
-        
-        // Verify image
-        async function verifyImage() {
-            if (!currentVerifyFile) return;
-            
-            const btn = document.getElementById('verifyBtn');
-            btn.disabled = true;
-            btn.textContent = '⏳ Verifying...';
-            
-            try {
-                const formData = new FormData();
-                formData.append('file', currentVerifyFile);
-                
-                const response = await fetch(API_URL + '/api/v1/verify', {
-                    method: 'POST',
-                    headers: API_KEY ? {'X-API-Key': API_KEY} : {},
-                    body: formData
-                });
-                
-                if (!response.ok) throw new Error('API error');
-                
-                const result = await response.json();
-                
-                const isValid = result.valid || result.verified;
-                showResult('verifyResult', isValid ? 'success' : 'error', `
-                    <h3>${isValid ? '✅ Valid Signature' : '❌ Invalid / Tampered'}</h3>
-                    ${result.creator ? `<p>Signed by: <strong>${result.creator}</strong></p>` : ''}
-                    ${result.timestamp ? `<p>Timestamp: ${result.timestamp}</p>` : ''}
-                    ${result.confidence ? `<p>Confidence: ${(result.confidence * 100).toFixed(1)}%</p>` : ''}
-                `);
-                
-            } catch (err) {
-                showResult('verifyResult', 'error', `
-                    <h3>⚠️ API Not Configured</h3>
-                    <p>Please configure the API endpoint in the top-right settings.</p>
-                    <p>Default endpoint: <code>${API_URL}</code></p>
-                `);
-            }
-            
-            btn.disabled = false;
-            btn.textContent = '🔍 Verify';
-        }
-        
-        // Generate image
-        async function generateImage() {
-            const prompt = document.getElementById('genPrompt').value;
-            if (!prompt) {
-                showResult('genResult', 'error', 'Please enter a prompt');
-                return;
-            }
-            
-            showResult('genResult', 'success', `
-                <h3>⏳ Generating...</h3>
-                <p>Prompt: ${prompt}</p>
-                <p>This feature requires API configuration. Please set up your AI generation API in settings.</p>
-            `);
-        }
-        
-        function showResult(id, type, html) {
-            const el = document.getElementById(id);
-            el.className = 'result ' + type + ' show';
-            document.getElementById(id + 'Content').innerHTML = html;
-        }
-    </script>
+    <!-- Sign/Verify Section -->
+    <section class="section" id="section-sign">
+
+      <!-- Creator ID input (only for signing) -->
+      <div class="creator-input-wrap">
+        <label for="creator-id" class="creator-label">Creator ID (optional)</label>
+        <input type="text" id="creator-id" class="creator-input" placeholder="e.g., artist_name or wallet address" maxlength="64">
+      </div>
+
+      <!-- Drop Zone -->
+      <div class="drop-zone" role="button" tabindex="0" aria-label="Drop image here or click to browse">
+        <input type="file" id="file-input" class="file-input" accept="image/*" aria-hidden="true">
+        <div class="drop-zone-inner">
+          <div class="drop-placeholder">
+            <div class="drop-icon">
+              <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="12" width="56" height="40" rx="6" stroke="#f5a623" stroke-width="2.5" fill="none"/>
+                <circle cx="24" cy="28" r="6" stroke="#f5a623" stroke-width="2" fill="none"/>
+                <path d="M8 48 L22 32 L32 42 L42 30 L56 48" stroke="#f5a623" stroke-width="2" fill="none" stroke-linejoin="round"/>
+                <path d="M38 20 L56 20" stroke="#f5a623" stroke-width="2" stroke-linecap="round"/>
+                <path d="M47 11 L47 29" stroke="#f5a623" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="drop-title">Drop your image here</p>
+            <p class="drop-subtitle">or click to browse</p>
+            <p class="drop-hint">Supports PNG, JPG, WEBP, BMP &middot; Max 20MB</p>
+          </div>
+
+          <!-- Canvas container -->
+          <div class="canvas-container">
+            <canvas id="canvas-original" class="main-canvas hidden" aria-label="Image preview"></canvas>
+            <canvas id="canvas-heatmap" class="heatmap-canvas hidden" aria-label="Watermark heatmap overlay"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image info bar -->
+      <div class="image-info hidden"></div>
+
+      <!-- Action Panel -->
+      <div class="action-panel hidden">
+        <button id="btn-sign" class="btn btn-primary" aria-label="Sign image">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          <span>Sign Image</span>
+        </button>
+        <button id="btn-verify" class="btn btn-secondary" aria-label="Verify image">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+          <span>Verify Image</span>
+        </button>
+        <button id="btn-download" class="btn btn-accent hidden" aria-label="Download signed image">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Download Signed</span>
+        </button>
+        <button id="btn-toggle-heatmap" class="btn btn-ghost hidden" aria-label="Toggle watermark heatmap">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <span>Show Watermark Heatmap</span>
+        </button>
+        <button id="btn-reset" class="btn btn-ghost" aria-label="Reset">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+          </svg>
+          <span>Reset</span>
+        </button>
+      </div>
+
+      <!-- Progress Panel -->
+      <div class="progress-panel hidden">
+        <div class="progress-header">
+          <span class="progress-stage">Processing...</span>
+          <span class="progress-percent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-detail"></div>
+        <div class="progress-stats">
+          <div class="stat">
+            <span class="stat-label">Stage</span>
+            <span class="stat-value progress-text">Preparing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Result Panel -->
+      <div class="result-panel hidden">
+        <div class="result-header">
+          <div class="result-indicator"></div>
+          <h3 class="result-status"></h3>
+        </div>
+        <div class="result-content"></div>
+      </div>
+
+      <!-- Signature Details -->
+      <div class="sig-details hidden">
+        <h4 class="sig-title">Signature Details</h4>
+        <div class="sig-grid">
+          <div class="sig-item">
+            <span class="sig-label">Image Hash</span>
+            <span class="sig-value mono" id="sig-hash">-</span>
+          </div>
+          <div class="sig-item">
+            <span class="sig-label">Nonce</span>
+            <span class="sig-value mono" id="sig-nonce">-</span>
+          </div>
+          <div class="sig-item">
+            <span class="sig-label">NTime</span>
+            <span class="sig-value mono" id="sig-ntime">-</span>
+          </div>
+          <div class="sig-item">
+            <span class="sig-label">Version</span>
+            <span class="sig-value" id="sig-version">-</span>
+          </div>
+          <div class="sig-item">
+            <span class="sig-label">Status</span>
+            <span class="sig-value" id="sig-status">-</span>
+          </div>
+          <div class="sig-item">
+            <span class="sig-label">Creator</span>
+            <span class="sig-value" id="sig-creator">-</span>
+          </div>
+          <div class="sig-item">
+            <span class="sig-label">Timestamp</span>
+            <span class="sig-value" id="sig-timestamp">-</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- History Section -->
+    <section class="section hidden" id="section-history">
+      <div class="section-header">
+        <h2 class="section-title">History</h2>
+        <p class="section-desc">Recent signing and verification operations</p>
+      </div>
+      <div class="history-panel">
+        <div class="history-list"></div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section hidden" id="section-about">
+      <div class="about-container">
+        <h2 class="about-title">About SiliconSignature</h2>
+
+        <div class="about-card">
+          <h3>What is SiliconSignature?</h3>
+          <p>
+            SiliconSignature is a cross-platform image authentication system that embeds
+            cryptographically signed watermarks directly into image pixels. Unlike visible
+            watermarks or metadata-based solutions, SiliconSignature stores signature data
+            in the least significant bits (LSB) of RGB channels, making it resilient to
+            format conversions and basic editing.
+          </p>
+        </div>
+
+        <div class="about-card">
+          <h3>How It Works</h3>
+          <ol class="about-steps">
+            <li>
+              <strong>Hash</strong> - Compute SHA-256 of the original image pixels
+            </li>
+            <li>
+              <strong>Proof of Work</strong> - Search for a nonce such that
+              SHA-256(SHA-256(hash || nonce)) &lt; difficulty target
+            </li>
+            <li>
+              <strong>Encode</strong> - Build JSON payload, apply Reed-Solomon error
+              correction (32 parity symbols over GF(2&#x2078;))
+            </li>
+            <li>
+              <strong>Embed</strong> - Write LSB of RGB channels with 5x repetition
+              for redundancy
+            </li>
+            <li>
+              <strong>Verify</strong> - Extract LSB bits, vote across 5 repetitions,
+              RS decode, validate signature
+            </li>
+          </ol>
+        </div>
+
+        <div class="about-card">
+          <h3>Technical Specifications</h3>
+          <div class="spec-grid">
+            <div class="spec-item">
+              <span class="spec-label">Field</span>
+              <span class="spec-value">GF(2&#x2078;) with primitive polynomial 0x11d</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Error Correction</span>
+              <span class="spec-value">32 Reed-Solomon symbols</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Repetition</span>
+              <span class="spec-value">5x redundancy</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Hash Function</span>
+              <span class="spec-value">SHA-256 (double)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Channels</span>
+              <span class="spec-value">RGB LSB (3 bits per pixel)</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label">Difficulty</span>
+              <span class="spec-value mono">0x0000FFFF...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-card">
+          <h3>Security Notes</h3>
+          <p>
+            This is a software simulation of ASIC-based signing. The proof-of-work uses
+            CPU-based nonce searching with a reduced difficulty target. For production use,
+            ASIC hardware (e.g., BM1387) provides the computational security guarantee.
+          </p>
+          <p>
+            LSB steganography is detectable by statistical analysis. For covert
+            applications, additional obfuscation techniques are recommended.
+          </p>
+        </div>
+
+        <div class="about-footer">
+          <p>SiliconSignature v1.0 &middot; Open Protocol &middot; Cross-Platform Compatible</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>SiliconSignature v1.0 &middot; Works Offline &middot; Zero Dependencies</p>
+  </footer>
+
+  <!-- Modal -->
+  <div class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Title</h3>
+        <button class="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/reedsolomon.js"></script>
+  <script src="js/crypto.js"></script>
+  <script src="js/watermark.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
