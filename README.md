@@ -1,206 +1,106 @@
-# <div align="center">🔏 SiliconSignature</div>
+# 🔐 SiliconSignature — ASIC Hardware-Bound Image Authentication
 
-<div align="center">
+> **Proof-of-Work meets Image Provenance.**
+> The only image authentication system that binds a physical ASIC (Antminer S9) to every pixel.
 
-**Hardware-Bound Image Authentication for the AI Era**
-
-*Prove image provenance with ASIC proof-of-work and Reed-Solomon watermarking*
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-00ff88.svg?style=for-the-badge)](LICENSE)
-[![PWA](https://img.shields.io/badge/PWA-Installable-00ccff.svg?style=for-the-badge)](https://silicon.p2pclaw.com)
-[![Web](https://img.shields.io/badge/Web-Live-ff6b6b.svg?style=for-the-badge)](https://silicon.p2pclaw.com)
-
-[![Go](https://img.shields.io/badge/Go-CLI-00ADD8.svg?style=flat-square&logo=go)](https://github.com/Agnuxo1/siliconsignature-go)
-[![Rust](https://img.shields.io/badge/Rust-Library-000000.svg?style=flat-square&logo=rust)](https://github.com/Agnuxo1/siliconsignature-rust)
-[![TypeScript](https://img.shields.io/badge/TypeScript-npm-3178C6.svg?style=flat-square&logo=typescript)](https://github.com/Agnuxo1/siliconsignature-ts)
-[![Android](https://img.shields.io/badge/Android-APK-3DDC84.svg?style=flat-square&logo=android)](https://github.com/Agnuxo1/silicon-android)
-
-</div>
+[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+[![P2PCLAW](https://img.shields.io/badge/Powered%20by-P2PCLAW-ff6b6b)](https://www.p2pclaw.com)
+[![ASIC](https://img.shields.io/badge/ASIC-Antminer%20S9%20BM1387-orange)](https://en.wikipedia.org/wiki/Antminer)
 
 ---
 
-## 🚨 The Problem
+## 🌐 Live Demo
 
-| Threat | Current Solutions | Why They Fail |
-|--------|----------------|---------------|
-| **Deepfakes** | Detection algorithms | Reactive — find fakes *after* creation |
-| **Image forgery** | EXIF metadata | Stripped in 1 click |
-| **AI watermarking** | C2PA, SynthID | Trusts corporations; removable |
-| **NFT provenance** | Blockchain tokens | Just a URL, not the image |
-
-**SiliconSignature is different.** We embed **unforgeable proof-of-work** directly into the image pixels — bound to a physical ASIC chip. No corporation to trust. No metadata to strip. No blockchain needed.
+| Platform | Status | URL |
+|----------|--------|-----|
+| **GitHub Pages** | ✅ LIVE | [agnuxo1.github.io/siliconsignature-web](https://agnuxo1.github.io/siliconsignature-web/) |
+| **PWA** | ✅ LIVE | [silicon.p2pclaw.com](https://silicon.p2pclaw.com) |
 
 ---
 
-## ⚡ How It Works
+## 📦 Ecosystem — 8 Languages/Platforms
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    SIGN AN IMAGE                              │
-│                                                               │
-│   1. SHA-256 hash of image bytes                              │
-│   2. Search for nonce via ASIC proof-of-work                 │
-│   3. Reed-Solomon ECC encodes (hash + nonce + metadata)       │
-│   4. Embed in LSB of blue channel (offset 0x20)               │
-│   5. Magic header "SSv1" + 5× redundancy                      │
-│                                                               │
-│   Result: Image looks identical. But pixels carry proof.      │
-└─────────────────────────────────────────────────────────────┘
-                              ↓
-┌─────────────────────────────────────────────────────────────┐
-│                   VERIFY AN IMAGE                             │
-│                                                               │
-│   1. Extract LSB from blue channel                            │
-│   2. Decode Reed-Solomon (tolerates 40% pixel loss)           │
-│   3. Validate nonce via SHA-256 check                         │
-│   4. Confirm ASIC work was performed                            │
-│                                                               │
-│   Result: Authentic or Tampered. Binary. No grey area.       │
-└─────────────────────────────────────────────────────────────┘
-```
+| Platform | Repo | Status |
+|----------|------|--------|
+| **Web (PWA)** | [siliconsignature-web](https://github.com/Agnuxo1/siliconsignature-web) | ✅ LIVE |
+| **Browser Extension** | [silicon-browser-extension](https://github.com/Agnuxo1/silicon-browser-extension) | ✅ LIVE |
+| **Go CLI/Serverless** | [siliconsignature-go](https://github.com/Agnuxo1/siliconsignature-go) | ✅ LIVE |
+| **Rust Library/WASM** | [siliconsignature-rust](https://github.com/Agnuxo1/siliconsignature-rust) | ✅ LIVE |
+| **TypeScript/npm** | [siliconsignature-ts](https://github.com/Agnuxo1/siliconsignature-ts) | ✅ LIVE |
+| **Android App** | [silicon-android](https://github.com/Agnuxo1/silicon-android) | ✅ LIVE |
+| **ComfyUI Node** | [silicon-comfyui-node](https://github.com/Agnuxo1/silicon-comfyui-node) | ✅ LIVE |
+| **A1111 Script** | [silicon-a1111-script](https://github.com/Agnuxo1/silicon-a1111-script) | ✅ LIVE |
 
 ---
 
-## 🎯 Compared to Alternatives
+## 🚀 Quick Start
 
-| | **SiliconSignature** | **C2PA (Adobe)** | **SynthID (Google)** | **NFT** |
-|---|:---:|:---:|:---:|:---:|
-| **Open Source** | ✅ MIT | ❌ Corporate | ❌ Corporate | Varies |
-| **No Dependencies** | ✅ Pure code | ❌ Ecosystem | ❌ API | ❌ Blockchain |
-| **Survives editing** | ✅ 40% pixels | ⚠️ Metadata only | ⚠️ Compression | ❌ None |
-| **Hardware-bound** | ✅ ASIC PoW | ❌ No | ❌ No | ❌ No |
-| **Cost to forge** | **$10,000+** | $0 (strip metadata) | $0 (remove sig) | $0 (screenshot) |
-| **Verification** | ✅ Offline | ❌ Needs Adobe | ❌ Needs Google | ❌ Needs blockchain |
+### Web App (No Install)
+1. Open [silicon.p2pclaw.com](https://silicon.p2pclaw.com)
+2. Upload image → Get ASIC-bound signature
+3. Share with anyone — verification is instant
 
----
-
-## 🚀 Live Demo
-**➡️ [[https://silicon.p2pclaw.com](https://luhw5qkxysa74.kimi.page/)**
-
-
-**➡️ [https://silicon.p2pclaw.com](https://silicon.p2pclaw.com)**
-
-Works offline. Install as PWA. Zero backend required.
-
----
-
-## 📦 Quick Start
-
-### As PWA (Recommended)
-
-```
-1. Visit silicon.p2pclaw.com
-2. Click "Add to Home Screen"
-3. Sign & verify images offline — forever
-```
-
-### Self-Hosted
-
+### Browser Extension
 ```bash
-git clone https://github.com/Agnuxo1/siliconsignature-web.git
-cd siliconsignature-web
-python3 -m http.server 8080
-# Open http://localhost:8080
+git clone https://github.com/Agnuxo1/silicon-browser-extension.git
+cd silicon-browser-extension
+# Load unpacked in Chrome/Firefox
 ```
 
-### API
-
+### npm Package
 ```bash
-# Sign
-curl -X POST https://silicon.p2pclaw.com/api/v1/sign \
-  -F "image=@photo.png" \
-  -F "creator_id=Agnuxo1"
+npm install siliconsignature
+```
 
-# Verify
-curl -X POST https://silicon.p2pclaw.com/api/v1/verify \
-  -F "image=@signed.png"
+### Go
+```bash
+go install github.com/Agnuxo1/siliconsignature-go@latest
+```
+
+### Rust
+```bash
+cargo install siliconsignature
 ```
 
 ---
 
-## 🏗️ Ecosystem
+## 🔬 How It Works
 
-SiliconSignature is available in **7 languages/platforms**:
+```
+Image → SHA-256 Hash → ASIC PoW (BM1387) → Reed-Solomon(255,223) → LSB Watermark
+         ↑                                                            ↓
+         └──────────── Verify: Extract LSB → Decode RS → Verify PoW ──┘
+```
 
-| Platform | Repository | Status |
-|----------|-----------|--------|
-| 🌐 **Web/PWA** | [siliconsignature-web](https://github.com/Agnuxo1/siliconsignature-web) | ✅ Live |
-| 🖥️ **Browser Extension** | [silicon-browser-extension](https://github.com/Agnuxo1/silicon-browser-extension) | ✅ Chrome/Firefox |
-| 🎨 **ComfyUI Node** | [silicon-comfyui-node](https://github.com/Agnuxo1/silicon-comfyui-node) | ✅ Custom node |
-| 🎨 **A1111 Script** | [silicon-a1111-script](https://github.com/Agnuxo1/silicon-a1111-script) | ✅ WebUI script |
-| 🐹 **Go CLI** | [siliconsignature-go](https://github.com/Agnuxo1/siliconsignature-go) | ✅ Binary |
-| 🦀 **Rust Library** | [siliconsignature-rust](https://github.com/Agnuxo1/siliconsignature-rust) | ✅ WASM + CLI |
-| 📦 **TypeScript/npm** | [siliconsignature-ts](https://github.com/Agnuxo1/siliconsignature-ts) | ✅ Browser + Node |
-| 🤖 **Android App** | [silicon-android](https://github.com/Agnuxo1/silicon-android) | ✅ APK |
-
----
-
-## 🛡️ Security Model
-
-**Threat: Forged watermark**
-- Cost to forge: **$10,000+** in ASIC hardware + electricity
-- Cost to verify: **$0** (software mode, 300ms)
-
-**Threat: Image editing**
-- Reed-Solomon **5× redundancy** survives:
-  - 40% pixel destruction
-  - JPEG recompression at quality ≥60
-  - Cropping (if watermark region preserved)
-  - Color adjustment (LSB preserved)
-
-**Threat: Metadata stripping**
-- Watermark is **in the pixel data**, not metadata
-- Stripping EXIF/XMP does **not** remove the signature
+| Feature | SiliconSignature | C2PA | SynthID | NFT |
+|---------|----------------|------|---------|-----|
+| **Hardware Proof** | ✅ ASIC | ❌ Trust Adobe | ❌ Cloud-only | ❌ Just a token |
+| **Survives 40% Edit** | ✅ Reed-Solomon | ❌ Fragile | ⚠️ Partial | ❌ No |
+| **Open Source** | ✅ Full | ⚠️ Partial | ❌ No | Varies |
+| **Cost to Attack** | **$200** (used S9) | **$10,000+** | **Unknown** | **Gas fees** |
 
 ---
 
-## 📊 Benchmarks
+## 📚 Documentation
 
-| Operation | Time | Notes |
-|-----------|------|-------|
-| Software sign (CPU) | ~300ms | Pure JS, single-thread |
-| Software verify (CPU) | ~150ms | Extract + RS decode + hash |
-| ASIC sign (BM1387) | ~2-5s | Real hardware, unforgeable |
-| Tamper survival | 40% | Reed-Solomon threshold |
-| Image quality impact | 0% | LSB change invisible |
+- [Full Paper](https://arxiv.org/abs/2604.19792)
+- [API Docs](https://api.silicon.p2pclaw.com/docs)
+- [Integration Guide](https://docs.p2pclaw.com/silicon)
 
 ---
 
-## 🤝 Contributing
+## 🏆 Awards
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-**Ways to help:**
-- 🐛 Report bugs via GitHub Issues
-- 💡 Suggest integrations (image generators, forensics tools, journalism platforms)
-- 🌍 Translate the web app
-- 🔬 Improve Reed-Solomon decoder performance
-- 🎨 Design better UI/UX
+- 🥇 NVIDIA LlamaIndex Developers 2024
+- 🌍 WIPO Global Awards 2026 (submitted)
 
 ---
 
-## 📄 License
+## 👤 Author
 
-MIT License — Francisco Angulo de Lafuente (@Agnuxo1)
-
-**Cite as:**
-> Angulo de Lafuente, F. (2026). *SiliconSignature: ASIC-Bound Image Authentication Using Reed-Solomon LSB Watermarking*. P2PCLAW Technical Report.
+**Francisco Angulo de Lafuente** (Agnuxo1)
+- ORCID: [0009-0001-1634-7063](https://orcid.org/0009-0001-1634-7063)
 
 ---
 
-## 🔗 Links
-
-- 🌐 **Website:** [silicon.p2pclaw.com](https://silicon.p2pclaw.com)
-- 🐦 **Twitter/X:** [@Agnuxo1](https://twitter.com/Agnuxo1)
-- 📚 **ResearchGate:** [Francisco Angulo de Lafuente](https://www.researchgate.net/profile/Francisco-Angulo-De-Lafuente)
-- 🏠 **Project Hub:** [p2pclaw.com](https://p2pclaw.com)
-
----
-
-<div align="center">
-
-**Built with 🔥 by [@Agnuxo1](https://github.com/Agnuxo1) — P2PCLAW Ecosystem**
-
-*"We don't trust. We verify."*
-
-</div>
+**Built with 🔥 by the P2PCLAW Collective**
